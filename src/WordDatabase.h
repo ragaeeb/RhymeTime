@@ -77,7 +77,7 @@ class WordDatabase : public QObject, public QRunnable
     bool m_close;
 
 signals:
-	void progress(int const& progress);
+	void progress(int progress);
 	void loadComplete();
 
 public:

@@ -748,18 +748,18 @@ void WordAssembler::addSolution(WordArray& phrase)
 		return;
 	}
 
-	if (0) {
-		printf("%2d ", solution.score);
-		for (int k = solution.length - 1; k >= 0; k--) {
-			printf("%s ", solution.words[k]->text);
-		}
-		printf(" [");
-		for (int k = solution.length - 1; k >= 0; k--) {
-			solution.words[k]->printPron();
-		}
-
-		printf("]\n");
-	}
+//	if (0) {
+//		printf("%2d ", solution.score);
+//		for (int k = solution.length - 1; k >= 0; k--) {
+//			printf("%s ", solution.words[k]->text);
+//		}
+//		printf(" [");
+//		for (int k = solution.length - 1; k >= 0; k--) {
+//			solution.words[k]->printPron();
+//		}
+//
+//		printf("]\n");
+//	}
 
 	if ((solutions.size() % 10000) == 0) {
 		LOGGER("Found %d solutions...." << solutions.size());

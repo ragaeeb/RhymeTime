@@ -2,29 +2,26 @@
 #include "Logger.h"
 
 #include <bb/cascades/AbstractPane>
+#include <bb/cascades/AbstractTextControl>
 #include <bb/cascades/ArrayDataModel>
 #include <bb/cascades/Application>
-#include <bb/cascades/ListItemProvider>
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/SceneCover>
-#include <bb/cascades/TextField>
-
-#include <bb/system/Clipboard>
-#include <bb/system/SystemToast>
 
 #include <QThreadPool>
+#include <QTimer>
 
 namespace rhymetime {
 
 using namespace bb::cascades;
-using namespace bb::system;
+using namespace canadainc;
 
 ApplicationUI::ApplicationUI(Application* app) :
 		QObject(app), db("app/native/assets/dict.txt"), m_loaded(false)
 {
-	if ( getValueFor("animations").isNull() ) { // first run
-		saveValueFor("animations", 1);
-	}
+	INIT_SETTING("animations", 1);
+
+	qmlRegisterType<QTimer>("ilmtest.rhymetime", 1, 0, "QTimer");
 
 	QmlDocument* qmlCover = QmlDocument::create("asset:///Cover.qml").parent(this);
 	Control* sceneRoot = qmlCover->createRootObject<Control>();
@@ -34,13 +31,12 @@ ApplicationUI::ApplicationUI(Application* app) :
     QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
     qml->setContextProperty("app", this);
     qml->setContextProperty("cover", sceneRoot);
+    qml->setContextProperty("persist", &m_persistance);
 
     AbstractPane *root = qml->createRootObject<AbstractPane>();
     app->setScene(root);
 
-    connect( app, SIGNAL( aboutToQuit() ), this, SLOT( onAboutToQuit() ) );
-
-    connect( &db, SIGNAL( progress(int) ), this, SLOT( progress(int const&) ) );
+    connect( &db, SIGNAL( progress(int) ), this, SLOT( progress(int) ) );
     connect( &db, SIGNAL( loadComplete() ), this, SLOT( databaseLoaded() ) );
 
     m_root = root;
@@ -53,12 +49,12 @@ void ApplicationUI::create(Application* app) {
 }
 
 
-void ApplicationUI::onAboutToQuit() {
+ApplicationUI::~ApplicationUI() {
 	db.close();
 }
 
 
-void ApplicationUI::progress(int const& progress) {
+void ApplicationUI::progress(int progress) {
 	m_root->setProperty("progressValue", progress);
 }
 
@@ -68,7 +64,7 @@ void ApplicationUI::databaseLoaded()
 	m_loaded = true;
 	m_root->setProperty("showProgress", false);
 
-	QString word = m_root->findChild<TextField*>("textField")->text();
+	QString word = m_root->findChild<AbstractTextControl*>("textField")->text();
 
 	if ( !word.isEmpty() )
 	{
@@ -80,18 +76,6 @@ void ApplicationUI::databaseLoaded()
 			dataModel->append(rhymes);
 		}
 	}
-}
-
-
-void ApplicationUI::copyWord(QString const& word)
-{
-	Clipboard clipboard;
-	clipboard.clear();
-	clipboard.insert( "text/plain", word.toUtf8() );
-
-	SystemToast st;
-	st.setBody( tr("Copied to clipboard: %1").arg(word) );
-	st.exec();
 }
 
 
@@ -114,22 +98,6 @@ QStringList ApplicationUI::getRhymesFor(QString const& word)
 	LOGGER( "getRhymesFor" << word << map.size() << map.values() );
 
 	return map.values();
-}
-
-
-QVariant ApplicationUI::getValueFor(QString const &objectName)
-{
-    QVariant value( m_settings.value(objectName) );
-	LOGGER("getValueFor()" << objectName << value);
-
-    return value;
-}
-
-
-void ApplicationUI::saveValueFor(QString const& objectName, QVariant const& inputValue)
-{
-	LOGGER("saveValueFor()" << objectName << inputValue);
-	m_settings.setValue(objectName, inputValue);
 }
 
 

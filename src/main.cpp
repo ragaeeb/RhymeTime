@@ -1,7 +1,5 @@
 #include <bb/cascades/Application>
 
-#include <QTimer>
-
 #include "applicationui.hpp"
 #include "Logger.h"
 
@@ -24,8 +22,6 @@ Q_DECL_EXPORT int main(int argc, char **argv)
 #ifdef DEBUG
 	qInstallMsgHandler(redirectedMessageOutput);
 #endif
-
-	qmlRegisterType<QTimer>("ilmtest.rhymetime", 1, 0, "QTimer");
 
     Application app(argc, argv);
     ApplicationUI::create(&app);

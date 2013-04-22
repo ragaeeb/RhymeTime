@@ -11,10 +11,10 @@ BasePage
         
         SettingPair {
             title: qsTr("Animations")
-        	toggle.checked: app.getValueFor("animations") == 1
+        	toggle.checked: persist.getValueFor("animations") == 1
     
             toggle.onCheckedChanged: {
-        		app.saveValueFor("animations", checked ? 1 : 0)
+        		persist.saveValueFor("animations", checked ? 1 : 0)
         		
         		if (checked) {
         		    infoText.text = qsTr("Controls will be animated whenever they are loaded.")

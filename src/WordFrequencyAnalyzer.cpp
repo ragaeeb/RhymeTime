@@ -71,7 +71,7 @@ void WordFrequencyAnalyzer::analyzeFile(const char* filename)
 	// open file.
 	FILE* file = fopen(filename, "rt");
 	if (file == 0) {
-		fprintf(stderr, "Couldn't open %s\n", filename );
+		LOGGER("Couldn't open" << filename);
 		return;
 	}
 

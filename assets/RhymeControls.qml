@@ -5,17 +5,18 @@ Container
 {
     property alias list: listView
     
-    attachedObjects: [
-        QTimer {
-            id: timer
-            
-            onTimeout: {
-                textField.requestFocus()
-            }
-        }
-    ]
-    
     TextField {
+
+	    attachedObjects: [
+	        QTimer {
+	            id: timer
+	            
+	            onTimeout: {
+	                textField.requestFocus()
+	            }
+	        }
+	    ]
+        
         id: textField
         objectName: "textField"
         hintText: qsTr("Enter a word...")
@@ -33,10 +34,10 @@ Container
                 }
             }
         ]
-
+        
         onCreationCompleted:
         {
-            if ( app.getValueFor("animations") == 1 ){
+            if ( persist.getValueFor("animations") == 1 ) {
                 translate.play()
             } else {
                 timer.singleShot = true;
@@ -52,17 +53,27 @@ Container
             
             if (rhymes.length > 0) {
                 dataModel.append(rhymes)
+                divider.visible = true
             }
         }
     }
+    
+    Divider {
+        id: divider
+    	bottomMargin: 0
+    	visible: false
+    }
 
     ListView {
-        property variant application: app
         id: listView
         
         dataModel: ArrayDataModel {
             objectName: "dataModel"
             id: dataModel
+        }
+        
+        function copyWord(ListItemData) {
+            persist.copyToClipboard(ListItemData)
         }
 
         listItemComponents: [
@@ -81,7 +92,7 @@ Container
                                 imageSource: "asset:///images/ic_copy.png"
                                 
                                 onTriggered: {
-                                    rootItem.ListItem.view.application.copyWord(ListItemData)
+                                    rootItem.ListItem.view.copyWord(ListItemData)
                                 }
                             }
                         }
